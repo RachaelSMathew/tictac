@@ -1,98 +1,139 @@
 #include <string>
 #include <iostream>
-#include <string.h>
-#include <stdio.h>
+#include <algorithm>
+
 using namespace std;
 using std::cin;
 
-int gameOver(int tic[3][3]) {
-    string ticStr = "";
+string makeStr(int tic[3][3]) {
+    string retArr;
     for(int i=0;i<3;i++) {
         for(int j=0;j<3;j++) {
-            ticStr += tic[i][j];
+            retArr += to_string(tic[i][j]);
         }
     }
-    bool over = ticStr.find("111") != string::npos;
-    over = ""+ticStr.at(0) == "1" and ""+ticStr.at(4) == "1" and ""+ticStr.at(8) == "1";
-    over = ""+ticStr.at(2) == "1" and ""+ticStr.at(4) == "1" and ""+ticStr.at(6) == "1";
+    return retArr;
+}
+
+int gameOver(const string& ticStr) {
+    string retArr[9] = {};
+    int startIndex = 0;
+    for(int i=0;i<9;i++) {
+        if(ticStr[startIndex] == '-') {
+            retArr[i] = ticStr.substr(startIndex, 2);
+            startIndex+=2;
+        } else {
+            retArr[i] = ticStr.substr(startIndex, 1);
+            startIndex+=1;
+        }
+    }
+
+    bool over = (retArr[0] == "1" and retArr[4] == "1" and retArr[8] == "1");
+    over = over or (retArr[2] == "1" and retArr[4] == "1" and retArr[6] == "1");
     if(over) {
         return 1;
     }
-    over = ticStr.find("-1-1-1") != string::npos;
-    over = ""+ticStr.at(0) == "-1" and ""+ticStr.at(4) == "-1" and ""+ticStr.at(8) == "-1";
-    over = ""+ticStr.at(2) == "-1" and ""+ticStr.at(4) == "-1" and ""+ticStr.at(6) == "-1";
+
+    over = (retArr[0] == "-1" and retArr[4] == "-1" and retArr[8] == "-1");
+    over = over or (retArr[2] == "-1" and retArr[4] == "-1" and retArr[6] == "-1");
     if(over) {
         return -1;
     }
 
     for(int i=0;i<3;i++) {
-        over = ""+ticStr.at(i) == "1" and ""+ticStr.at(i+3) == "1" and ""+ticStr.at(i+6) == "1";
+        over = (retArr[3*i] == "1" and retArr[(3*i)+1] == "1" and retArr[(3*i)+2] == "1");
+        over = over or (retArr[i] == "1" and retArr[i+3] == "1" and retArr[i+6] == "1");
         if(over) {
             return 1;
         }
-        over = ""+ticStr.at(i) == "-1" and ""+ticStr.at(i+3) == "-1" and ""+ticStr.at(i+6) == "-1";
+        over = (retArr[3*i] == "-1" and retArr[(3*i)+1] == "-1" and retArr[(3*i)+2] == "-1");
+        over = over or (retArr[i] == "-1" and retArr[i+3] == "-1" and retArr[i+6] == "-1");
         if(over) {
             return -1;
         }
     }
-    return 0;
+    //board game completely filled
+    if(ticStr.find('0') >= ticStr.length()) {
+        return 0;
+    }
+
+    return -100; //game's not over yet
 }
 
 /*
-return int[4] = who won, depth, move[0], move[1] 
+return int[4] = who won, depth, move[0], move[1]
 */
-int* minimax(int arr[3][3], int depth, int turn, int move[2]) {
+string minimax(string arr, int depth, int turn, int move[2]) {
     int isOver = gameOver(arr);
-    if(isOver != 0) {
-        static int retArr[4] = {isOver, depth, move[0], move[1]};
-        return retArr;
+    if(isOver != -100) {
+        return to_string(isOver) + " " + to_string(depth) + " " + to_string(move[0]) + " " + to_string(move[1]);
     }
 
     int lowestDep = INT_MAX;
-    int whoWon = 1;
+    int whoWon = turn == -1 ? 100 : -100; //no one won
+    int newMoves[2] = {0,0};
+    int num = 0;
+    for(int i=0;i<arr.length();i++) {
+        if(arr[i] == '1') {
+            num += 1;
+        }
+        if(arr[i] == '0') {
+            num+=1;
+            int moveNext[2] = {(num-1)/3,(num-1)%3};
+            string copyTic = arr.substr(0, i-1) + to_string(turn) + arr.substr(i+1);
 
-    for(int i=0;i<3;i++) {
-        for(int j=0;j<3;j++) {
-            if(arr[i][j] == 0) {
-                int moveNext[2] = {i,j};
-                arr[i][j] = turn;
-                static int* retArr = minimax(arr, depth+1, turn == 1 ? -1 : 1, moveNext);
-                if(retArr[0] == -1 and lowestDep > retArr[1]) {
-                    whoWon = -1;
-                    lowestDep = retArr[1];
-                    move[0] = retArr[2];
-                    move[1] = retArr[3];
-                }
+            string retArr = minimax(copyTic, depth+1, turn == 1 ? -1 : 1, moveNext);
 
+            //returns which player won
+            int retTurn = stoi(retArr.substr(0, retArr.find(' ')));
+            retArr = retArr.substr(retArr.find(' ')+1);
+
+            //returns the path with smallest depth
+            int retLowest = stoi(retArr.substr(0, retArr.find(' ')));
+            retArr = retArr.substr(retArr.find(' ')+1);
+
+            //what move computer should make
+            int retMove_1 = stoi(retArr.substr(0, retArr.find(' ')));
+            retArr = retArr.substr(retArr.find(' ')+1);
+            int retMove_2 = stoi(retArr.substr(0, retArr.find(' ')));
+            string ddd = copyTic;
+
+            // if turn O, then finding minimum return value
+            // if turn X, then finding maximum return value
+            if(
+            (turn == -1 and retTurn < whoWon) or (turn == 1 and retTurn > whoWon)
+            or (retTurn == whoWon and lowestDep > retLowest)
+            ) {
+                whoWon = retTurn;
+                lowestDep = retLowest;
+                newMoves[0] = retMove_1;
+                newMoves[1] = retMove_2;
             }
         }
     }
-    static int retArr[4] = {whoWon,lowestDep,move[0],move[1]};
-    return retArr;
+    return to_string(whoWon) + " " + to_string(lowestDep) + " " + to_string(newMoves[0]) + " " + to_string(newMoves[1]);
 }
 
 int main () {
     //user is 1(max) X
     //computer is -1(min) O
-
     int  tic[3][3] = {0};
-    while(gameOver(tic) == 0) {
+    while(gameOver(makeStr(tic)) == -100) {
         string nextMove;
-        //printing board \t is a tab 
         for(int i=0;i<3;i++)
         {
             for(int j=0;j<3;j++)
             {
                 string printVar;
                 switch(tic[i][j]) {
-                case 1:
-                    printVar = "X";
-                    break;
-                case -1:
-                    printVar = "O";
-                    break;
-                default:
-                    printVar = "";
+                    case 1:
+                        printVar = "X";
+                        break;
+                    case -1:
+                        printVar = "O";
+                        break;
+                    default:
+                        printVar = "";
                 }
 
                 cout<<"   "<<printVar<<"   ";
@@ -104,21 +145,43 @@ int main () {
                 }
             }
             if(i==0 or i==1) {
-                cout<<"-------------------"<<endl;
+                cout<<"----------------------"<<endl;
             }
-        } 
-        cout<<"What's your move? (format: x, y)\n";
+        }
+        cout<<"What's your move? (format: x,y)\n";
+
         cin>>nextMove;
-        int x = stoi(nextMove.substr (0, nextMove.find(",")));
-        int y = stoi(nextMove.substr (nextMove.find(",")+1));
+        int x = stoi(nextMove.substr(0, nextMove.find(',')));
+        int y = stoi(nextMove.substr(nextMove.find(',')+1));
 
         if(tic[x][y] != -1) {
             tic[x][y] = 1;
         }
+        // depth = 0 when game board is empty
+        int move[2] = {-1,-1};
+        string answer = minimax(makeStr(tic), 1, -1, move);
+
+        int retTurn = stoi(answer.substr(0, answer.find(' ')));
+        answer = answer.substr(answer.find(' ')+1);
+        answer = answer.substr(answer.find(' ')+1);
+        int retMove_1 = stoi(answer.substr(0, answer.find(' ')));
+        answer = answer.substr(answer.find(' ')+1);
+        int retMove_2 = stoi(answer.substr(0, answer.find(' ')));
+
+        if(retTurn == -1) {
+            tic[retMove_1][retMove_2] = -1;
+        } else { //find the first empty square and fill it
+            for(auto & i : tic) {
+                for(int & j : i) {
+                    if(j ==0) {
+                        j = -1;
+                        break;
+                    }
+                }
+            }
+
+        }
     }
-    // depth = 0 when game board is empty 
-    int move[2] = {-1,-1};
-    int* answer = minimax(tic, 2, -1, move);
-    
+
     exit(0);
 }
