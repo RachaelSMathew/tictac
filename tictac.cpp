@@ -158,7 +158,7 @@ int main () {
                 validMove = true;
             }
             if(!validMove) {
-                getMoveStr = "Please enter a valid coordinate that isn't filled up";
+                getMoveStr = "Please enter a valid coordinate that isn't filled up\n";
             }
         }
         if(gameOver(makeStr(tic)) == 1) {
