@@ -179,6 +179,9 @@ int main () {
         tic[retMove_1][retMove_2] = -1;
 
     }
-
+    if(gameOver(makeStr(tic)) == -1) {
+        cout << "Computer won" <<endl;
+        return 0;
+    }
     exit(0);
 }
