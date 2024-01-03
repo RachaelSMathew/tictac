@@ -1,3 +1,5 @@
+/*This is for running a tic tac toe game in the terminal*/
+
 #include <string>
 #include <iostream>
 #include <algorithm>
