@@ -53,6 +53,5 @@ string minimax(string arr, int depth, int turn, int move[2]) {
             }
         }
     }
-
     return to_string(whoWon) + " " + to_string(lowestDep) + " " + to_string(newMoves[0]) + " " + to_string(newMoves[1]);
 }

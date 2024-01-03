@@ -2,13 +2,27 @@
 #include "nextmove.h"
 #include "./ui_mainwindow.h"
 #include <QDebug>
+#include <QTime>
 #include <string>
+#include <QTimer>
 #include <iostream>
 
 using namespace std;
 using std::cin;
 
 QVector<QPushButton *> buttons;
+QString userName;
+int userScore = 0;
+int compScore = 0;
+
+QTimer *t;
+
+void delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     ui->setupUi(this);
+    ui->compScore->setVisible(false);
+    ui->userScore->setVisible(false);
     buttons.append(ui->pushButton_1);
     buttons.append(ui->pushButton_2);
     buttons.append(ui->pushButton_3);
@@ -25,6 +41,24 @@ MainWindow::MainWindow(QWidget *parent)
     buttons.append(ui->pushButton_7);
     buttons.append(ui->pushButton_8);
     buttons.append(ui->pushButton_9);
+    for(QPushButton * button: buttons) {
+        button->setVisible(false);
+    }
+    ui->pushButton->setVisible(false);
+    ui->label->setVisible(false);
+    ui->label_2->setText("");
+
+    t = new QTimer(this);
+    QTime timeThing = QTime(0,0,0,0);
+
+    t->setInterval(1000);
+    connect(t, &QTimer::timeout, [&]() {
+        timeThing = timeThing.addSecs(1);
+        ui->label_2->setText("Timer: "+timeThing.toString());
+        if(ui->label_2->text() == "Timer: 00:03:00") {
+            QApplication::quit();
+        }
+    } );
 }
 
 MainWindow::~MainWindow()
@@ -140,9 +174,25 @@ void nextMove(QPushButton *b, Ui::MainWindow *ui) {
 
     //check if game done
     if(gameOver(makeStr(ui)) != -100) {
-
         //say who won
-        QApplication::quit();
+        if(gameOver(makeStr(ui)) == -1) {
+            compScore += 1;
+            ui->compScore->setText("Computer Score: "+ QString::number(compScore));
+            ui->label->setText("Computer won!");
+        } else if(gameOver(makeStr(ui)) == 1) {
+            userScore += 1;
+            ui->userScore->setText(userName + " Score: "+QString::number(userScore));
+            ui->label->setText(userName + " won!");
+        } else {
+            ui->label->setText("No one won!");
+        }
+
+        ui->label->setVisible(true);
+        delay();
+        for(QPushButton * button: buttons) {
+            button->setText("");
+        }
+        ui->label->setVisible(false);
     }
 
 
@@ -208,6 +258,26 @@ void MainWindow::on_pushButton_clicked()
     for(QPushButton * button: buttons) {
         button->setText("");
     }
+    ui->label->setVisible(false);
 }
 
+
+void MainWindow::on_pushButton_10_clicked()
+{
+    userName = ui->lineEdit->text();
+    ui->lineEdit->setVisible(false);
+    ui->pushButton_10->setVisible(false);
+    ui->label_3->setVisible(false);
+    for(QPushButton * button: buttons) {
+        button->setVisible(true);
+    }
+    ui->compScore->setVisible(true);
+    ui->userScore->setVisible(true);
+    ui->pushButton->setVisible(true);
+    ui->userScore->setText(userName + " Score: "+QString::number(compScore));
+    ui->compScore->setText("Computer Score: "+ QString::number(userScore));
+
+    t->start();
+
+}
 
