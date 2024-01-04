@@ -30,9 +30,7 @@ string minimax(string arr, int depth, int turn, int move[2]) {
             string copyTic = arr.substr(0, i) + to_string(turn) + arr.substr(i+1);
 
             string retArr = minimax(copyTic, depth+1, turn == 1 ? -1 : 1, moveNext);
-            if(depth ==1) {
-                cout << retArr<<"okay" << num<<". "<<endl;
-            }
+
             //returns which player won
             int retTurn = stoi(retArr.substr(0, retArr.find(' ')));
             retArr = retArr.substr(retArr.find(' ')+1);
