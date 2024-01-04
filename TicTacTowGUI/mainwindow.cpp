@@ -281,3 +281,9 @@ void MainWindow::on_pushButton_10_clicked()
 
 }
 
+
+void MainWindow::on_pushButton_11_clicked()
+{
+    QCoreApplication::quit();
+}
+

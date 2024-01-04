@@ -783,7 +783,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>0</y>
+      <y>20</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -846,7 +846,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>0</y>
+      <y>-10</y>
       <width>271</width>
       <height>71</height>
      </rect>
@@ -888,6 +888,24 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_11">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Exit</string>
     </property>
    </widget>
   </widget>
