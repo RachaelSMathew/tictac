@@ -10,3 +10,8 @@
 - Scorboard between computer and player
 - Player can choose dimension of board(2-6)
 
+## Files
+- **CMakeLists.txt**: contains a set of directives and instructions describing the project's source files and targets (executable, library, or both)
+
+
+
