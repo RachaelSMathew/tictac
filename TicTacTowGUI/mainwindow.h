@@ -8,7 +8,8 @@
 using namespace std;
 using std::cin;
 
-int gameOver(const string& ticStr);
+double gameOver(const string& ticStr, bool acc=false);
+int countZero(const string& ticStr);
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,23 +26,9 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_1_clicked();
+    void MakeBoard();
 
-    void on_pushButton_4_clicked();
-
-    void on_pushButton_7_clicked();
-
-    void on_pushButton_2_clicked();
-
-    void on_pushButton_5_clicked();
-
-    void on_pushButton_8_clicked();
-
-    void on_pushButton_3_clicked();
-
-    void on_pushButton_6_clicked();
-
-    void on_pushButton_9_clicked();
+    void userMove();
 
     void on_pushButton_clicked();
 

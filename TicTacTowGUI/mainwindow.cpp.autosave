@@ -13,12 +13,12 @@
 using namespace std;
 using std::cin;
 
-QVector<QPushButton *> buttons;
-QString userName;
-int userScore = 0;
-int compScore = 0;
-int dim = 3;
-QTimer *t;
+QVector<QPushButton *> buttons; // array of each tile on the tic tac toe board 
+QString userName; 
+int userScore = 0; // user's score 
+int compScore = 0; // computer's score
+int dim = 3; // dimension (2-6) user choosed 
+QTimer *t; // timer limit of 3 minute 
 
 void delay()
 {
@@ -37,10 +37,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->compScore->setVisible(false);
     ui->userScore->setVisible(false);
 
-    ui->pushButton->setVisible(false);
+    ui->pushButton->setVisible(false); // reset button to reset the grid 
     ui->label->setVisible(false);
     ui->label_2->setText("");
-
+    
+    //creates a 3 minute timer that closes the app after it's completed 
     t = new QTimer(this);
     QTime timeThing = QTime(0,0,0,0);
 
@@ -68,7 +69,10 @@ string ticToNum(QString tic) {
         return "0";
     }
 }
-string makeStr(Ui::MainWindow *ui) {
+
+// converts the array of button tiles to a string where X is 1 and O is -1 and empty space is 0
+// converting into string right to left, going down 
+string makeStr(Ui::MainWindow *ui) { 
     string retArr = "";
     for(int i=0;i<(dim*dim);i++) {
         retArr.append(ticToNum(buttons[i]->text()));
@@ -77,9 +81,9 @@ string makeStr(Ui::MainWindow *ui) {
     return retArr;
 }
 
+// counts the amount of empty spaces in a board 
 int countZero(const string& ticStr) {
 
-    //board game (almost) completely filled
     int countZero = 0;
     for(int i=0;i<ticStr.length();i++) {
         if(ticStr[i] == '0') {
@@ -89,19 +93,20 @@ int countZero(const string& ticStr) {
     return countZero;
 }
 
-std::map<std::string, double> overAcc;
+std::map<std::string, double> overAcc; // stores the previous game boards their values 
 
 double gameOver(const string& ticStr, bool acc) {
     double maxValNotOver = 0.0;
 
-    if (overAcc.find(ticStr) != overAcc.end()) {
+    if (overAcc.find(ticStr) != overAcc.end()) { // checks if ticStr already has been passed in gameOver 
         return overAcc[ticStr];
     }
+    
     double maxVal = 0.0;
     double prune = (1.0);
-
+    
+    // converts a string of the tic tac toe board into an array where each index is a value on the board 
     QVector<string> retArr = {};
-
     int startIndex = 0;
     for(int i=0;i<dim*dim;i++) {
         if(ticStr[startIndex] == '-') {
@@ -112,7 +117,10 @@ double gameOver(const string& ticStr, bool acc) {
             startIndex+=1;
         }
     }
-
+    
+    //checks the 2 diagonals of the board game
+    // if -1 exists in tile then -1/dim is added to diagonals value
+    // if 1 exists in tile then 1/dim is added to
     double diag1 = 0;
     bool broken = false;
     for(int i=0;i<dim;i++) {
@@ -238,6 +246,7 @@ void computerMoves(Ui::MainWindow *ui, int move_1, int move_2) {
     }
 }
 
+//checks if the game is over, and if so, updates the score and clears the grid 
 void checkOver(Ui::MainWindow *ui) {
     double overVal = gameOver(makeStr(ui), true);
 
@@ -257,12 +266,15 @@ void checkOver(Ui::MainWindow *ui) {
 
         ui->label->setVisible(true);
         delay();
+        //clears the board 
         for(QPushButton * button: buttons) {
             button->setText("");
         }
         ui->label->setVisible(false);
     }
 }
+
+// adds an X to the move a player makes and finds the next best move for the computer to make 
 void nextMove(QPushButton *b, Ui::MainWindow *ui) {
 
     if(b->text() == "") {
@@ -289,11 +301,11 @@ void nextMove(QPushButton *b, Ui::MainWindow *ui) {
 
     answer = answer.substr(answer.find(' ')+1);
     answer = answer.substr(answer.find(' ')+1);
-    retMove_1 = stoi(answer.substr(0, answer.find(' ')));
+    retMove_1 = stoi(answer.substr(0, answer.find(' '))); // x coordinate of best move for comp(0 indexed) 
     answer = answer.substr(answer.find(' ')+1);
-    retMove_2 = stoi(answer.substr(0, answer.find(' ')));
+    retMove_2 = stoi(answer.substr(0, answer.find(' '))); // y coordinate of best move for comp(0 indexed) 
 
-    //have computer make next move
+    // computer makes next move
     computerMoves(ui, retMove_1, retMove_2);
 
     for(QPushButton * button: buttons) {
@@ -306,6 +318,7 @@ void nextMove(QPushButton *b, Ui::MainWindow *ui) {
 
 }
 
+// when reset button is clicked, empties the entire board 
 void MainWindow::on_pushButton_clicked()
 {
     for(QPushButton * button: buttons) {
@@ -314,11 +327,13 @@ void MainWindow::on_pushButton_clicked()
     ui->label->setVisible(false);
 }
 
+// adds an X to the tile the user chooses 
 void MainWindow::userMove() {
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     nextMove(button, ui);
 }
 
+// creates a tic tac toe board game based on the dimension the user chose 
 void MainWindow::MakeBoard() {
 
     for(int i=0;i<dim;i++) {

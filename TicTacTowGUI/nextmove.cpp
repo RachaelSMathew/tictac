@@ -8,15 +8,26 @@ using namespace std;
 using std::cin;
 
 nextMove::nextMove() {}
+/*
+ * returns:
+ * whoWon(closer to -1-player O won, closer to 1-player X won)
+ * depth: amount of moves to get to winning game board
+ * move_1: x coordinate (0 indexed)
+ * move_2: y coordinate (0 indexed)
+ */
+string minimax(string arr, int depth, int turn, int move[2], int dim, bool acc, double alpha, double beta) {
+    double bestVal = turn == 1 ? std::numeric_limits<double>::min() : std::numeric_limits<double>::max();
 
-string minimax(string arr, int depth, int turn, int move[2]) {
-    int isOver = gameOver(arr);
-    if(isOver != -100) {
+    // value of board game (-1 if O won, 1 if X won and 0 if no one won)
+    double isOver = gameOver(arr, acc);
+    if(isOver ==0 or isOver == 1 or isOver == -1
+        or ((dim == 4 or dim == 5 or countZero(arr) <= dim*3) and depth >= 8) //restrict depth to optimize runtime
+        or (dim == 6 and countZero(arr) > dim*3 and depth >=5)) {
         return to_string(isOver) + " " + to_string(depth) + " " + to_string(move[0]) + " " + to_string(move[1]);
     }
 
     int lowestDep = INT_MAX;
-    int whoWon = turn == -1 ? 100 : -100; //no one won
+    double whoWon = turn == -1 ? 100.0 : -100.0;
     int newMoves[2] = {0,0};
     int num = 0;
 
@@ -24,15 +35,16 @@ string minimax(string arr, int depth, int turn, int move[2]) {
         if(arr[i] == '1') {
             num += 1;
         }
-        else if(arr[i] == '0') {
+        else if(arr[i] == '0') { // finds the empty spaces in an tic tac toe board
             num+=1;
-            int moveNext[2] = {(num-1)/3,(num-1)%3};
-            string copyTic = arr.substr(0, i) + to_string(turn) + arr.substr(i+1);
+            int moveNext[2] = {(num-1)/dim,(num-1)%dim};
+            string copyTic = arr.substr(0, i) + to_string(turn) + arr.substr(i+1); // adds a value (-1-player O or 1-player X) to the board game
 
-            string retArr = minimax(copyTic, depth+1, turn == 1 ? -1 : 1, moveNext);
+            string retArr = minimax(copyTic, depth+1, turn == 1 ? -1 : 1, moveNext, dim, false, alpha, beta); // recursive minimax
 
             //returns which player won
-            int retTurn = stoi(retArr.substr(0, retArr.find(' ')));
+            double retTurn = stod(retArr.substr(0, retArr.find(' ')));
+
             retArr = retArr.substr(retArr.find(' ')+1);
 
             //returns the path with smallest depth
@@ -46,9 +58,24 @@ string minimax(string arr, int depth, int turn, int move[2]) {
                 ) {
                 whoWon = retTurn;
                 lowestDep = retLowest;
-                newMoves[0] = (num-1)/3;
-                newMoves[1] = (num-1)%3;
+                newMoves[0] = (num-1)/dim;
+                newMoves[1] = (num-1)%dim;
             }
+
+            //alpha beta pruning
+            bestVal = turn == 1?max(bestVal, retTurn):min(bestVal, retTurn);
+            if(turn == 1) {
+                alpha = max(alpha, bestVal);
+            } else {
+                beta = min(beta, bestVal);
+            }
+            if (beta <= alpha) {
+                break;
+            }
+
+
+
+
         }
     }
     return to_string(whoWon) + " " + to_string(lowestDep) + " " + to_string(newMoves[0]) + " " + to_string(newMoves[1]);
