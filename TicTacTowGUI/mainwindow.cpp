@@ -123,8 +123,10 @@ double gameOver(const string& ticStr, bool acc) {
     // if 1 exists in tile then 1/dim is added to diagonals value
     // calculates the 2 diagonals value for player X and O repsectively
     // while calculating the diagonal for one player, if you find the other player, the diagonal becomes "broken" or 0
+    // BROKEN: X X O X X
+    // UNBROKEN: X X X X X
     
-    // sum of the diagonal 1 and 2 for player X 
+    // sum of the diagonal 1 for player X 
     double diag1 = 0;
     bool broken = false;
     for(int i=0;i<dim;i++) {
@@ -136,7 +138,7 @@ double gameOver(const string& ticStr, bool acc) {
             diag1 = 0;
         }
     }
-    // sum of the diagonal 1 and 2 for player X 
+    // sum of the diagonal 2 for player X 
     double diag2 = 0;
     broken = false;
     for(int i=0;i<dim;i++) {
@@ -158,7 +160,7 @@ double gameOver(const string& ticStr, bool acc) {
     maxValNotOver = max(maxValNotOver, diag1);
     maxValNotOver = max(maxValNotOver, diag2);
     
-    // sum of the diagonal 1 and 2 for player O
+    // sum of the diagonal 1 for player O
     double diag1_n = 0;
     broken = false;
     for(int i=0;i<dim;i++) {
@@ -170,7 +172,7 @@ double gameOver(const string& ticStr, bool acc) {
             diag1_n = 0;
         }
     }
-    // sum of the diagonal 1 and 2 for player O 
+    // sum of the diagonal 2 for player O 
     double diag2_n = 0;
     broken = false;
     for(int i=0;i<dim;i++) {
@@ -193,6 +195,7 @@ double gameOver(const string& ticStr, bool acc) {
         maxVal = abs(diag2_n) > abs(maxVal) ? diag2_n : maxVal;
     }
 
+    // calculates maximum UNbroken row/column/diagonal for player X or O 
     int winners[] = {1,-1};
     for(int k=0;k<2;k++) {
         for(int i=0;i<dim;i++) {
@@ -245,7 +248,7 @@ double gameOver(const string& ticStr, bool acc) {
 
     overAcc[ticStr] = maxValNotOver;
 
-    return maxValNotOver; //game's not over yet
+    return maxValNotOver; //game's not over yet, but calculates the row/column/diagonal with the largest(absolute) UNbroken value for either player X or O
 }
 
 void computerMoves(Ui::MainWindow *ui, int move_1, int move_2) {
