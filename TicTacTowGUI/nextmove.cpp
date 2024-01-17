@@ -54,7 +54,7 @@ string minimax(string arr, int depth, int turn, int move[2], int dim, bool acc, 
             // if turn X, then finding maximum return value
             if(
                 (turn == -1 and retTurn < whoWon) or (turn == 1 and retTurn > whoWon)
-                or (retTurn == whoWon and lowestDep > retLowest)
+                or (retTurn == whoWon and lowestDep > retLowest) // finds the returned value with the lowest depth (nearest solution)
                 ) {
                 whoWon = retTurn;
                 lowestDep = retLowest;
