@@ -38,8 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->userScore->setVisible(false);
 
     ui->pushButton->setVisible(false); // reset button to reset the grid 
-    ui->label->setVisible(false);
-    ui->label_2->setText("");
+    ui->label->setVisible(false); // label for saying who won game 
+    ui->label_2->setText(""); // label for timer 
     
     //creates a 3 minute timer that closes the app after it's completed 
     t = new QTimer(this);
