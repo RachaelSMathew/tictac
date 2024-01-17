@@ -12,6 +12,7 @@
 
 ## Files
 - **CMakeLists.txt**: contains a set of directives and instructions describing the project's source files and targets (executable, library, or both)
+- **tictac.cpp**: allows you to run a 3 by 3 tic tac toe board game in terminal (comp vs. player)
 
 
 
