@@ -5,6 +5,7 @@
 4. Press the green play button 
 
 # Features 
+- Game is unbeatable (i.e., the computer wins or no one wins)
 - User can choose a username which is displayed while game is played
 - Timer for three minutes is run and if it runs out, game automatically exits
 - Scorboard between computer and player
